@@ -1,9 +1,11 @@
+import os
 import streamlit as st
 import pandas as pd
 import sqlite3
 import requests
 import time
 from datetime import datetime
+import extract
 
 # =========================================================================
 # ⚙️ CONFIGURATION ET DÉFINITIONS GLOBALES
@@ -158,20 +160,37 @@ def get_ranking_analysis():
 
 
 # =========================================================================
+# 🌐 INITIALISATION ET VÉRIFICATION DES DONNÉES
+# =========================================================================
+
+def initialiser_donnees():
+    """Vérifie si la base existe, sinon lance une extraction initiale."""
+    if not os.path.exists(DB_NAME):
+        st.warning("⚠️ Base de données introuvable. Lancement de l'extraction initiale...")
+        try:
+            extract.run_extraction()
+            st.success("✅ Données récupérées avec succès !")
+        except Exception as e:
+            st.error(f"Erreur lors de l'initialisation : {e}")
+
+
+# =========================================================================
 # 🌐 APPLICATION STREAMLIT PRINCIPALE
 # =========================================================================
 
 def main():
     st.set_page_config(layout="wide")
-    st.title("🚲 Surveillance du Réseau VCUB (Bordeaux) - Pipeline E-T-L-A")
-    st.caption("Données récupérées de l'API CityBikes, stockées dans SQLite, et visualisées via Streamlit.")
+    st.title("Mon Dashboard Bordeaux VLS")
+    
+    # Étape de secours
+    initialiser_donnees()
     
     # --- Contrôle d'Ingestion ---
     col_button, col_time = st.columns([1, 2])
     
     if col_button.button("🔄 Lancer l'Ingestion E-T-L Maintenant"):
         with st.spinner('Extraction, Transformation et Chargement des données en cours...'):
-            run_ingestion_cycle()
+            extract.run_extraction()
         st.experimental_rerun() # Rafraîchir toute l'interface après l'ingestion réussie
 
     st.markdown("---")
