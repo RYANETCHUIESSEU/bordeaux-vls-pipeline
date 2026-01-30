@@ -159,6 +159,33 @@ LIMIT 10;
 
 
 # ===============================================
+# FONCTION D'EXTRACTION PRINCIPALE
+# ===============================================
+
+def run_extraction():
+    """Exécute un cycle complet d'extraction et d'analyse des données."""
+    print(f"[DEBUT] Démarrage de l'extraction des stations de Bordeaux.")
+    
+    try:
+        timestamp_start = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print(f"\n[{timestamp_start}] --- Début du cycle d'ingestion ---")
+        
+        # Exécute la tâche E-T-L
+        run_ingestion_cycle()
+        
+        # Exécute l'analyse après le cycle
+        analyze_and_rank_stations()
+        
+        timestamp_end = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print(f"[{timestamp_end}] --- Extraction terminée ---")
+        
+    except KeyboardInterrupt:
+        print("\n\nArrêt de l'extraction par l'utilisateur.")
+    except Exception as e:
+        print(f"[ERREUR] Erreur lors de l'extraction : {e}")
+
+
+# ===============================================
 # BOUCLE PRINCIPALE (Automatisation)
 # ===============================================
 
